@@ -9,6 +9,11 @@
        <servlet-name>wechatServlet</servlet-name>
        <servlet-class>com.wechat.servlet.WechatServlet</servlet-class>
     </servlet>
+    
+    <servlet-mapping>
+       <servlet-name>wechatServlet</servlet-name>
+       <url-pattern>/wx.do</url-pattern>
+    </servlet-mapping>
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
