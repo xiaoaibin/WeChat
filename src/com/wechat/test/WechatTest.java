@@ -69,7 +69,8 @@ public class WechatTest {
 	{"type":"thumb","thumb_media_id":"Scsxi6ujXa3my8ItPVIgyBkn-Sm3G6CRimk9sDfeVZJyAFnfuDHmQtBb-cZ7t3ni","created_at":1496372712}
 	thumbMediaId:Scsxi6ujXa3my8ItPVIgyBkn-Sm3G6CRimk9sDfeVZJyAFnfuDHmQtBb-cZ7t3ni*/
 	
-	public static void main(String[] args) {
+	// 4.测试创建自定义菜单
+	/*public static void main(String[] args) {
 		try {
 			AccessToken token = WechatUtil.getAccessToken();
 			System.out.println("票据："+token.getToken());
@@ -87,5 +88,53 @@ public class WechatTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 	    }
-	}
+	}*/
+	
+	// 5.测试查询菜单
+	/*public static void main(String[] args) {
+		try {
+			AccessToken token = WechatUtil.getAccessToken();
+			System.out.println("票据："+token.getToken());
+			System.out.println("有效时间："+token.getExpiresIn());
+			
+			JSONObject jsonObject = WechatUtil.queryMenu(token.getToken());
+			System.out.println(jsonObject);
+		} catch (Exception e) {
+			e.printStackTrace();
+	    }
+	}*/
+	
+	// 6.测试删除菜单
+	/*public static void main(String[] args) {
+		try {
+			AccessToken token = WechatUtil.getAccessToken();
+			System.out.println("票据："+token.getToken());
+			System.out.println("有效时间："+token.getExpiresIn());
+			
+			int result = WechatUtil.deleteMenu(token.getToken());
+			if(result==0){
+				System.out.println("菜单删除成功");
+			}else{
+				System.out.println("删除失败 errcode:"+result);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+	    }
+	}*/
+	
+	// 7.百度翻译API测试，不能用，已经关闭了
+	/*public static void main(String[] args) {
+		try {
+			AccessToken token = WechatUtil.getAccessToken();
+			System.out.println("票据："+token.getToken());
+			System.out.println("有效时间："+token.getExpiresIn());
+			
+			String result = WechatUtil.translate("足球");
+			System.out.println(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+	    }
+	}*/
+	
+	
 }

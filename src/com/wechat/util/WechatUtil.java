@@ -8,11 +8,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -28,6 +32,10 @@ import com.wechat.menu.Button;
 import com.wechat.menu.ClickButton;
 import com.wechat.menu.Menu;
 import com.wechat.menu.ViewButton;
+import com.wechat.trans.Data;
+import com.wechat.trans.Parts;
+import com.wechat.trans.Symbols;
+import com.wechat.trans.TransResult;
 
 import net.sf.json.JSONObject;
 
@@ -46,10 +54,16 @@ public class WechatUtil {
 	private static final String APPID = "wxf845957f70e0210d";
 	private static final String APPSECRET = "1966ba1cf8f5dd8fcb34e9add6e67efa";
 	
+	
 	private static final String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
 	private static final String UPLOAD_URL = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE";
-	
 	private static final String CREATE_MENU_URL = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=ACCESS_TOKEN";
+	private static final String QUERY_MENU_URL = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=ACCESS_TOKEN";
+	private static final String DELETE_MENU_URL =  "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=ACCESS_TOKEN";
+	
+	private static final String BAIDU_API_KEY = "1ZdT3SL5ORl9mEmUxA8aa9Nl";
+	//private static final String BAIDU_TRANSLATE_URL = "http://openapi.baidu.com/public/2.0/translate/dict/simple?client_id=YourApiKey&q=do&from=en&to=zh";
+	private static final String BAIDU_TRANSLATE_URL = "http://openapi.baidu.com/public/2.0/translate/dict/simple?client_id=YourApiKey&q=KEYWORD&from=auto&to=zh";
 	
 	/**
 	 * get请求
@@ -225,7 +239,7 @@ public class WechatUtil {
 		ViewButton button21 = new ViewButton();
 		button21.setName("view菜单");
 		button21.setType("view");
-		button21.setUrl("http://blog.csdn.net/xiaoaibin");
+		button21.setUrl("https://my.oschina.net/aibinxiao");
 		
 		ClickButton button31 = new ClickButton();
 		button31.setName("扫码事件");
@@ -233,9 +247,9 @@ public class WechatUtil {
 		button31.setKey("31");
 		
 		ClickButton button32 = new ClickButton();
-		button31.setName("地理位置");
-		button31.setType("location_select");
-		button31.setKey("32");
+		button32.setName("地理位置");
+		button32.setType("location_select");
+		button32.setKey("32");
 		
 		Button button = new Button();
 		button.setName("菜单");
@@ -259,5 +273,88 @@ public class WechatUtil {
 			result = jsonObject.getInt("errcode");
 		}
 		return result;
+	}
+	
+	/**
+	 * 查询菜单
+	 * @param token
+	 * @return
+	 */
+	public static JSONObject queryMenu(String token){
+		String url = QUERY_MENU_URL.replace("ACCESS_TOKEN", token);
+		JSONObject jsonObject = doGetStr(url);
+		return jsonObject;
+	}
+	
+	/**
+	 * 删除菜单
+	 * @param token
+	 * @return
+	 */
+	public static int deleteMenu(String token){
+		String url = DELETE_MENU_URL.replace("ACCESS_TOKEN", token);
+		JSONObject jsonObject = doGetStr(url);
+		// 根据errcode判断是否删除成功，errcode为0时删除成功
+		int result = 0;
+		if(jsonObject!=null){
+			result = jsonObject.getInt("errcode");
+		}
+		return result;
+	}
+	
+	/**
+	 * 百度翻译API,单词翻译 已经关闭，现在无法用了
+	 * @param source
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public static String translate(String source) throws UnsupportedEncodingException{
+		String url = BAIDU_TRANSLATE_URL.replace("YourApiKey", BAIDU_API_KEY);
+		url.replace("KEYWORD", URLEncoder.encode(source,"UTF-8"));
+		JSONObject jsonObject = doGetStr(url);
+		String errno = jsonObject.getString("errno");
+		Object obj = jsonObject.get("data");
+		StringBuffer dst = new StringBuffer();
+		if("0".equals(errno) && !"[]".equals(obj.toString())){
+			TransResult transResult = (TransResult) JSONObject.toBean(jsonObject, TransResult.class);
+			Data data = transResult.getData();
+			Symbols symbols = data.getSymbols()[0];
+			String phzh = symbols.getPh_zh()==null?"":"中文拼音:"+symbols.getPh_zh();
+			String phen = symbols.getPh_en()==null?"":"英式音标:"+symbols.getPh_en();
+			String pham = symbols.getPh_am()==null?"":"美式音标:"+symbols.getPh_am();
+			dst.append(phzh+phen+pham);
+			
+			Parts[] parts = symbols.getParts();
+			String pat = null;
+			for (Parts part : parts) {
+				pat = (part.getPart()!=null && !"".equals(part.getPart())) ? "["+part.getPart()+"]":"";
+				String[] means = part.getMeans();
+				dst.append(pat);
+				for (String mean : means) {
+					dst.append(mean+";");
+				}
+			}
+		}else{
+			dst.append(translateFull(source));
+		}
+		return dst.toString();
+	}
+	
+	/**
+	 * 百度翻译API 词组翻译 已经关闭，现在无法用了
+	 * @param source
+	 * @return
+	 * @throws UnsupportedEncodingException 
+	 */
+	public static String translateFull(String source) throws UnsupportedEncodingException{
+		String url = BAIDU_TRANSLATE_URL.replace("YourApiKey", BAIDU_API_KEY);
+		url.replace("KEYWORD", URLEncoder.encode(source,"UTF-8"));
+		JSONObject jsonObject = doGetStr(url);
+		StringBuffer dst = new StringBuffer();
+		List<Map> list = (List<Map>) jsonObject.get("trans_result");
+		for (Map map : list) {
+			dst.append(map.get("dst"));
+		}
+		return dst.toString();
 	}
 }
