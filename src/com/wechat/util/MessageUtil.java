@@ -178,7 +178,7 @@ public class MessageUtil {
 		news.setTitle("飞鱼说编程介绍");
 		news.setDescription("分享程序员飞鱼的生活点滴、学习编程的心得见解以及工作项目的记录。这里有飞鱼好玩的故事，也有正在学习的编程技术个人笔记和方法总结，还有踏入工作后，每日工作的总结记录。");
 		news.setPicUrl("http://feiyucoding.tunnel.2bdata.com/WeChat/image/kevin.jpg");
-		news.setUrl("http://blog.csdn.net/xiaoaibin");
+		news.setUrl("https://my.oschina.net/aibinxiao/blog/913600");
 		
 		newsList.add(news);
 		newsMessage.setToUserName(fromUserName);
